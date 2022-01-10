@@ -1,0 +1,75 @@
+#!/bin/bash
+
+#go to top
+cd ~
+
+#make the desired directory
+mkdir mis_genomas
+
+#move to the recently created directory
+cd mis_genomas
+
+#Download the 10 genoms and the 10 annotation files
+#1
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/abaca_bunchy_top_virus_uid28697/NC_010314.fna
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/abaca_bunchy_top_virus_uid28697/NC_010314.gff
+#2
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/abalone_herpesvirus_victoria_aus_2009_uid177933/NC_018874.fna
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/abalone_herpesvirus_victoria_aus_2009_uid177933/NC_018874.gff
+#3
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/abalone_shriveling_syndrome_associated_virus_uid33141/NC_011646.fna
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/abalone_shriveling_syndrome_associated_virus_uid33141/NC_011646.gff
+#4
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/abelson_murine_leukemia_virus_uid14654/NC_001499.fna
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/abelson_murine_leukemia_virus_uid14654/NC_001499.gff
+#5
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/abisko_virus_uid399942/NC_035470.fna
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/abisko_virus_uid399942/NC_035470.gff
+#6
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/abutilon_brazil_virus_uid48591/NC_014138.fna
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/abutilon_brazil_virus_uid48591/NC_014138.gff
+#7
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/abutilon_mosaic_bolivia_virus_uid62479/NC_015045.fna
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/abutilon_mosaic_bolivia_virus_uid62479/NC_015045.gff
+#8
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/abutilon_mosaic_brazil_virus_uid81009/NC_016574.fna
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/abutilon_mosaic_brazil_virus_uid81009/NC_016574.gff
+#9
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/acholeplasma_virus_mv_l51_uid14573/NC_001341.fna
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/acholeplasma_virus_mv_l51_uid14573/NC_001341.gff
+#10
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/acartia_tonsa_copepod_circovirus_uid186432/NC_020099.fna
+wget https://ftp.ncbi.nlm.nih.gov/genomes/Viruses/acartia_tonsa_copepod_circovirus_uid186432/NC_020099.gff
+###
+
+#concatenate all the genome files
+cat *fna > todos_los_genomas.fna
+
+#compress the concatenated file
+gzip todos_los_genomas.fna
+
+#decompress the file without having to erease the compressed file
+gzip -k *gz
+
+#make a file with all genomes but being RNA
+sed s/T/U/g *fna > RNA_file.fna
+
+#remove the compressed file
+rm *gz
+
+####count the codons
+#start codons
+grep -c AUG RNA_file.fna
+
+#stop codons
+egrep -c "UAG|UGA|UAA" RNA_file.fna
+
+##########################
+#annotation files
+#lenght of CDS
+#best ideas so far :(
+grep CDS *gff | awk " BEGIN {$5 - $4}" *gff  #not really
+awk "{ sum += $ "5-4" } END { print sum } *gff" #maybe
+grep CDS *gff | echo $((5 - 4 )) #nope, but can subtract at least
+awk "{ sum += $5 - $4 } END { print sum } *gff" #Yaaaas
+###
